@@ -1,0 +1,1 @@
+# minaret-prayer-places
