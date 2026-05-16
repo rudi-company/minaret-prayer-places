@@ -1,0 +1,61 @@
+[
+  {
+    "id": "heathrow-t2-prayer",
+    "name": "Multi-Faith Prayer Room",
+    "kind": "prayerRoom",
+    "latitude": 51.47095,
+    "longitude": -0.45187,
+    "venue": "London Heathrow — Terminal 2",
+    "venueType": "airport",
+    "locationDescription": "Level 3, Zone B",
+    "accessNote": "Airside — post-security only",
+    "ablutionFacilities": true
+  },
+  {
+    "id": "heathrow-t5-prayer",
+    "name": "Multi-Faith Prayer Room",
+    "kind": "prayerRoom",
+    "latitude": 51.47225,
+    "longitude": -0.48898,
+    "venue": "London Heathrow — Terminal 5",
+    "venueType": "airport",
+    "locationDescription": "Level 3, near Gates B",
+    "accessNote": "Airside — post-security only",
+    "ablutionFacilities": true
+  },
+  {
+    "id": "dubai-t3-prayer",
+    "name": "Prayer Room",
+    "kind": "prayerRoom",
+    "latitude": 25.25481,
+    "longitude": 55.35867,
+    "venue": "Dubai International — Terminal 3",
+    "venueType": "airport",
+    "locationDescription": "Multiple locations throughout",
+    "ablutionFacilities": true
+  },
+  {
+    "id": "changi-t1-prayer",
+    "name": "Prayer Room",
+    "kind": "prayerRoom",
+    "latitude": 1.35949,
+    "longitude": 103.98831,
+    "venue": "Singapore Changi — Terminal 1",
+    "venueType": "airport",
+    "locationDescription": "Level 2, Departure Transit Hall",
+    "accessNote": "Airside — post-security only",
+    "ablutionFacilities": true
+  },
+  {
+    "id": "amsterdam-schiphol-prayer",
+    "name": "Prayer Room",
+    "kind": "prayerRoom",
+    "latitude": 52.31047,
+    "longitude": 4.76817,
+    "venue": "Amsterdam Airport Schiphol",
+    "venueType": "airport",
+    "locationDescription": "Lounge 3, near Gate D",
+    "accessNote": "Airside — post-security only",
+    "ablutionFacilities": true
+  }
+]
