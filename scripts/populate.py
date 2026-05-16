@@ -14,10 +14,14 @@ import urllib.parse
 import urllib.request
 from typing import Optional
 
-OVERPASS_URL = "https://overpass-api.de/api/interpreter"
+OVERPASS_ENDPOINTS = [
+    "https://overpass.kumi.systems/api/interpreter",
+    "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+    "https://overpass-api.de/api/interpreter",
+]
+
 OUTPUT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "places.json")
 
-# Only prayer rooms — not all mosques (that would be millions of records)
 OVERPASS_QUERY = """
 [out:json][timeout:180];
 (
@@ -48,34 +52,35 @@ VENUE_TYPE_MAP = {
 }
 
 
-def fetch_osm(retries: int = 3) -> list:
-    params = urllib.parse.urlencode({"data": OVERPASS_QUERY}).encode("utf-8")
-    req = urllib.request.Request(
-        OVERPASS_URL,
-        data=params,
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
-    )
-    for attempt in range(1, retries + 1):
-        try:
-            print(f"  Attempt {attempt}/{retries}…")
-            with urllib.request.urlopen(req, timeout=240) as resp:
-                return json.loads(resp.read()).get("elements", [])
-        except urllib.error.HTTPError as e:
-            print(f"  HTTP error {e.code}: {e.reason}")
-            if e.code == 429:
-                wait = 60 * attempt
-                print(f"  Rate-limited — waiting {wait}s before retry")
-                time.sleep(wait)
-            elif attempt == retries:
-                raise
-            else:
-                time.sleep(30)
-        except Exception as e:
-            print(f"  Error: {e}")
-            if attempt == retries:
-                raise
-            time.sleep(30)
-    return []
+def fetch_osm() -> list:
+    encoded = urllib.parse.quote(OVERPASS_QUERY)
+    headers = {
+        "Accept": "application/json",
+        "User-Agent": "MinaretApp/1.0 prayer-places-dataset",
+    }
+    for endpoint in OVERPASS_ENDPOINTS:
+        url = f"{endpoint}?data={encoded}"
+        req = urllib.request.Request(url, headers=headers)
+        for attempt in range(1, 3):
+            try:
+                print(f"  {endpoint} (attempt {attempt})…")
+                with urllib.request.urlopen(req, timeout=240) as resp:
+                    result = json.loads(resp.read())
+                    return result.get("elements", [])
+            except urllib.error.HTTPError as e:
+                print(f"  HTTP {e.code}: {e.reason}")
+                if e.code == 429:
+                    print("  Rate-limited — waiting 60s")
+                    time.sleep(60)
+                else:
+                    break  # try next endpoint
+            except Exception as e:
+                print(f"  Error: {e}")
+                if attempt < 2:
+                    time.sleep(15)
+                else:
+                    break
+    raise RuntimeError("All Overpass endpoints failed")
 
 
 def get_lat_lon(el: dict):
@@ -115,7 +120,7 @@ def access_note(tags: dict) -> Optional[str]:
 
 
 def venue_type(tags: dict) -> Optional[str]:
-    for key in ("building", "location", "indoor", "landuse", "amenity:location"):
+    for key in ("building", "location", "indoor", "landuse"):
         val = tags.get(key, "").lower().replace(" ", "_")
         if val in VENUE_TYPE_MAP:
             return VENUE_TYPE_MAP[val]
@@ -128,11 +133,7 @@ def element_to_entry(el: dict) -> Optional[dict]:
     if lat is None or lon is None:
         return None
 
-    name = (
-        tags.get("name:en")
-        or tags.get("name")
-        or "Prayer Room"
-    )
+    name = tags.get("name:en") or tags.get("name") or "Prayer Room"
     if not name.strip():
         name = "Prayer Room"
 
@@ -182,7 +183,7 @@ def element_to_entry(el: dict) -> Optional[dict]:
 
 def load_existing(path: str) -> list:
     if not os.path.exists(path):
-        print(f"  No existing file found at {path} — starting fresh")
+        print(f"  No existing file at {path} — starting fresh")
         return []
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
