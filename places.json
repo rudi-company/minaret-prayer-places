@@ -57,5 +57,13 @@
     "locationDescription": "Lounge 3, near Gate D",
     "accessNote": "Airside — post-security only",
     "ablutionFacilities": true
+  },
+  {
+    "id": "osm|node|11991734704",
+    "name": "Prayer Room",
+    "kind": "prayerRoom",
+    "latitude": 41.420502,
+    "longitude": 19.714105,
+    "locationDescription": "Level 1"
   }
 ]
